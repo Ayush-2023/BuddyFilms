@@ -38,7 +38,7 @@ public class LoginGUI extends Application {
             Stage stage = (Stage) usernameField.getScene().getWindow();
             Parent root = FXMLLoader.load(getClass().getResource("SignupGUI.fxml"));
             stage.setTitle("Buddy Films-Sign Up");
-            stage.setScene(new Scene(root, 300, 200));
+            stage.setScene(new Scene(root, 310, 220));
             stage.show();
         }catch (IOException e){
             e.printStackTrace();
@@ -71,7 +71,7 @@ public class LoginGUI extends Application {
                 Parent root= loader.load();
                 stage.setTitle("Buddy Films");
                 //v: width  v1: height
-                stage.setScene(new Scene(root, 460, 400));
+                stage.setScene(new Scene(root, 460, 410));
                 stage.show();
 
                 //passing message to next GUI controller
@@ -92,7 +92,7 @@ public class LoginGUI extends Application {
                 stage.show();
 
                 FailureGUI failureGUIObject=loader.<FailureGUI>getController();
-                failureGUIObject.setFailureMessageLabel("Login credentials incorrect, Please try again");
+                failureGUIObject.setFailureMessageLabel("Login credentials incorrect");
             }
             catch(IOException e) {
                 e.printStackTrace();

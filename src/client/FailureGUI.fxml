@@ -6,7 +6,7 @@
 
 <AnchorPane prefHeight="153.0" prefWidth="287.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.FailureGUI">
    <children>
-      <Label fx:id="failureMessageLabel" layoutX="81.0" layoutY="41.0" text="Operation Unsuccessful" />
+      <Label fx:id="failureMessageLabel" alignment="CENTER" layoutY="42.0" prefHeight="17.0" prefWidth="287.0" text="Operation Unsuccessful" textAlignment="CENTER" />
       <Button fx:id="retryButton" layoutX="122.0" layoutY="85.0" mnemonicParsing="false" onAction="#retryHandler" text="Retry" />
    </children>
 </AnchorPane>

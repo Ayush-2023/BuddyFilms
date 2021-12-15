@@ -2,8 +2,12 @@ package client;
 
 import dataClasses.User;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -24,7 +28,8 @@ public class SignupGUI {
     private User newUser;
 
     public void signupListener(ActionEvent actionEvent) throws IOException {
-        if(passwordField.getText().equals(confirmPasswordField.getText())) {
+        //checking that password is same as confirmed password
+        if(passwordField.getText().equals(confirmPasswordField.getText())&&passwordField.getText().length()>5) {
             socket = new Socket("localhost", 5436);
 
             objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
@@ -43,6 +48,34 @@ public class SignupGUI {
             System.out.println("Getting Status");
             Boolean validity = objectInputStream.readBoolean();
             System.out.println(validity);
+            if(validity) {
+                Stage stage = (Stage) usernameField.getScene().getWindow();
+                Parent root = FXMLLoader.load(getClass().getResource("LoginGUI.fxml"));
+                stage.setTitle("Buddy Films-Login");
+                //v: width  v1: height
+                stage.setScene(new Scene(root, 400, 350));
+                stage.show();
+            }else{
+                Stage stage =(Stage) usernameField.getScene().getWindow();
+                FXMLLoader loader= new FXMLLoader(getClass().getResource("FailureGUI.fxml"));
+                Parent root=loader.load();
+                stage.setTitle("Login Failure");
+                stage.setScene(new Scene(root, 300, 200));
+                stage.show();
+
+                FailureGUI failureGUIObject=loader.<FailureGUI>getController();
+                failureGUIObject.setFailureMessageLabel("Username already in use");
+            }
+        }else{
+            Stage stage =(Stage) usernameField.getScene().getWindow();
+            FXMLLoader loader= new FXMLLoader(getClass().getResource("FailureGUI.fxml"));
+            Parent root=loader.load();
+            stage.setTitle("Login Failure");
+            stage.setScene(new Scene(root, 300, 200));
+            stage.show();
+
+            FailureGUI failureGUIObject=loader.<FailureGUI>getController();
+            failureGUIObject.setFailureMessageLabel("Password and Confirmed Password Mismatch");
         }
     }
 }
