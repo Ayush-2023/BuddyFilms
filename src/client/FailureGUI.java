@@ -25,4 +25,8 @@ public class FailureGUI {
             e.printStackTrace();
         }
     }
+
+    public void setFailureMessageLabel(String message){
+        this.failureMessageLabel.setText(message);
+    }
 }

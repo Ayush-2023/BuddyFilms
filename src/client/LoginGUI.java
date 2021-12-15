@@ -85,10 +85,14 @@ public class LoginGUI extends Application {
         else{
             try{
                 Stage stage =(Stage) usernameField.getScene().getWindow();
-                Parent root= FXMLLoader.load(getClass().getResource("FailureGUI.fxml"));
+                FXMLLoader loader= new FXMLLoader(getClass().getResource("FailureGUI.fxml"));
+                Parent root=loader.load();
                 stage.setTitle("Login Failure");
                 stage.setScene(new Scene(root, 300, 200));
                 stage.show();
+
+                FailureGUI failureGUIObject=loader.<FailureGUI>getController();
+                failureGUIObject.setFailureMessageLabel("Login credentials incorrect, Please try again");
             }
             catch(IOException e) {
                 e.printStackTrace();
