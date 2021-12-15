@@ -1,4 +1,4 @@
-package sample;
+package server;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,7 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.*;
 
-import sample.User;
+import dataClasses.User;
 
 public class HandleClientSocket implements Runnable {
     private User user;

@@ -1,5 +1,6 @@
-package sample;
+package client;
 
+import dataClasses.User;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;

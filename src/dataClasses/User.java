@@ -1,4 +1,4 @@
-package sample;
+package dataClasses;
 
 import java.io.Serializable;
 
