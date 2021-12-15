@@ -1,4 +1,4 @@
-package sample.dataClasses;
+package sample;
 
 import java.io.Serializable;
 
@@ -7,8 +7,8 @@ public class User implements Serializable {
     private String password;
 
     public User() {
-        name = new String();
-        password = new String();
+        name = "";
+        password = "";
     }
 
     public User(String name,String password){

@@ -1,4 +1,4 @@
-package sample.server;
+package sample;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -6,8 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.sql.*;
 
-import sample.dataClasses.User;
-import sample.dataClasses.ValidityStatus;
+import sample.User;
 
 public class HandleClientSocket implements Runnable {
     private User user;
@@ -15,12 +14,16 @@ public class HandleClientSocket implements Runnable {
     private Socket socket;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
+    private Connection connection;
 
-    public HandleClientSocket(Socket socket) throws IOException {
+    public HandleClientSocket(Socket socket) throws IOException, ClassNotFoundException, SQLException {
         this.socket=socket;
         user=new User();
         objectInputStream=new ObjectInputStream(socket.getInputStream());
         objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
+        Class.forName("com.mysql.jdbc.Driver");
+        String url = "jdbc:mysql://localhost:3306/streamapp";
+        this.connection = DriverManager.getConnection(url, "root", "TetraM0s");
     }
 
     @Override
@@ -30,23 +33,30 @@ public class HandleClientSocket implements Runnable {
         try {
             //reading operation required
             operation=(String)objectInputStream.readObject();
-            user=(User)objectInputStream.readObject();
-            objectOutputStream.writeBoolean(false);
-            objectOutputStream.flush();
 
             if(operation.equals("Login")){
-                Class.forName("com.mysql.jdbc.Driver");
-                String url = "jdbc:mysql://localhost:13720/demo";
-                Connection connection = DriverManager.getConnection(url, "root", "TetraM0s");
-                /*
+
                 //reading the User object
                 user=(User)objectInputStream.readObject();
-                String query1 = "SELECT count(*) FROM User where Username="+user.getName()+";";
-                String query2 = "Insert into User(Username,Password) value("
-                        +user.getName()+","+user.getPassword()+");";
-                PreparedStatement preStat = connection.prepareStatement(query1);
 
+                //writing the sql query
+                String query1 = "SELECT count(*) FROM User where Username=\""+user.getName()+
+                        "\"and Password=\""+user.getPassword()+"\";";
+
+                //setting statement, executing it and storing result in resultSet
+                PreparedStatement preStat = connection.prepareStatement(query1);
                 ResultSet result = preStat.executeQuery();
+
+                //checking if select statement executed successfully
+                if(result.next()){
+                    //returns count(*)==1(ie if username exits or not)  to client
+                    objectOutputStream.writeBoolean(result.getInt("count(*)") == 1);
+                }else{
+                    objectOutputStream.writeBoolean(false);
+                }
+                objectOutputStream.flush();
+            }else{
+                /*
                 if(result.next()){
                     if(result.getInt("count(*)")==0){
                         preStat = connection.prepareStatement(query2);
@@ -59,9 +69,7 @@ public class HandleClientSocket implements Runnable {
                 }else{
                     objectOutputStream.writeBoolean(false);
                 }
-                */
-            }else{
-
+                 */
             }
             System.out.println("Client Handled");
         } catch (Exception e) {

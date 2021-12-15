@@ -1,4 +1,4 @@
-package sample.client;
+package sample;
 
 import javafx.application.Application;
 import javafx.event.ActionEvent;
@@ -13,8 +13,6 @@ import java.io.IOException;
 import java.net.Socket;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-
-import sample.dataClasses.*;
 
 public class LoginGUI extends Application {
     private Socket socket;
@@ -35,7 +33,15 @@ public class LoginGUI extends Application {
     }
 
     public void signUpHandler(ActionEvent actionEvent) {
-
+        try {
+            Stage stage = (Stage) usernameField.getScene().getWindow();
+            Parent root = FXMLLoader.load(getClass().getResource("SignupGUI.fxml"));
+            stage.setTitle("Buddy Films-Sign Up");
+            stage.setScene(new Scene(root, 300, 200));
+            stage.show();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
     }
 
     public void signInHandler(ActionEvent actionEvent) throws IOException {
@@ -53,18 +59,32 @@ public class LoginGUI extends Application {
         objectOutputStream.flush();
 
         //read validity
+        //for debugging
         System.out.println("Getting Status");
-        Boolean validity=(Boolean)objectInputStream.readBoolean();
-        System.out.println("Hello");
+        boolean validity=objectInputStream.readBoolean();
 
         if(validity){
-            System.out.println(usernameField.getText());
-            System.out.println(passwordField.getText());
+            try{
+                Stage stage =(Stage) usernameField.getScene().getWindow();
+                FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+                Parent root= loader.load();
+                stage.setTitle("Buddy Films");
+                //v: width  v1: height
+                stage.setScene(new Scene(root, 460, 400));
+                stage.show();
+
+                //passing message to next GUI controller
+                UserProfile userProfileObject = loader.<UserProfile>getController();
+                userProfileObject.setUsername(user.getName());
+            }
+            catch(IOException e) {
+                e.printStackTrace();
+            }
         }
         else{
             try{
                 Stage stage =(Stage) usernameField.getScene().getWindow();
-                Parent root = FXMLLoader.load(getClass().getResource("FailureGUI.fxml"));
+                Parent root= FXMLLoader.load(getClass().getResource("FailureGUI.fxml"));
                 stage.setTitle("Login Failure");
                 stage.setScene(new Scene(root, 300, 200));
                 stage.show();
