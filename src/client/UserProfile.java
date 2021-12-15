@@ -3,8 +3,6 @@ package client;
 import javafx.event.ActionEvent;
 import javafx.scene.control.Label;
 
-import java.awt.*;
-
 public class UserProfile {
     public Label nameField;
 
