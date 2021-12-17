@@ -47,7 +47,7 @@ public class HandleClientSocket implements Runnable {
                 case "Unfriend" -> this.unfriendHandler();
                 case "Send Request" -> this.sendRequestHandler();
             }
-            this.closePipes();
+            //this.closePipes();
             System.out.println("Client Handled");
         } catch (Exception e) {
             e.printStackTrace();
@@ -59,8 +59,8 @@ public class HandleClientSocket implements Runnable {
         String friend=(String)objectInputStream.readObject();
 
         //writing the sql query
-        String query="INSERT INTO Requests(To_User,By_User) value(\""+username+
-                "\",\""+friend+"\");";
+        String query="INSERT INTO Requests(To_User,By_User) value(\""+friend+
+                "\",\""+username+"\");";
         PreparedStatement preStat = connection.prepareStatement(query);
         objectOutputStream.writeBoolean(preStat.executeUpdate()==1);
         objectOutputStream.flush();
@@ -76,11 +76,11 @@ public class HandleClientSocket implements Runnable {
         String query2="DELETE FROM Friends WHERE Username=\""+friend+
                 "\" AND Friend=\""+username+"\";";
         PreparedStatement preStat = connection.prepareStatement(query1);
-        if(preStat.executeUpdate()==1) {
+        if(preStat.executeUpdate() == 1) {
             objectOutputStream.writeBoolean(true);
             objectOutputStream.flush();
             preStat = connection.prepareStatement(query2);
-            objectOutputStream.writeObject(preStat.executeUpdate() == 1);
+            objectOutputStream.writeBoolean(preStat.executeUpdate() == 1);
         }else{
             objectOutputStream.writeBoolean(false);
         }

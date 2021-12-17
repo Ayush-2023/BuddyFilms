@@ -47,9 +47,14 @@ public class OthersProfile {
             //reading status
             //for debugging
             System.out.println("Getting status");
-            if(objectInputStream.readBoolean()&&objectInputStream.readBoolean()){
-                this.friended=false;
-                this.setFlags();
+
+            if(objectInputStream.readBoolean()){
+                if(objectInputStream.readBoolean()) {
+                    this.friended = false;
+                    this.setFlags();
+                }else{
+                    System.out.println("Error");
+                }
             }else{
                 System.out.println("Error");
             }
@@ -71,12 +76,12 @@ public class OthersProfile {
     }
 
     public void setFlags(){
-        if(friended) {
+        if(this.friended) {
             this.unfriendButton.setText("Unfriend");
             this.requestButton.setText("Already Friends");
         }else{
             this.unfriendButton.setText("Not a Friend");
-            if(sentRequest){
+            if(this.sentRequest){
                 this.requestButton.setText("Request Sent");
             }else{
                 this.requestButton.setText("Send Request");

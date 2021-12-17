@@ -27,7 +27,6 @@ public class UserProfile {
     }
 
     public void showFriendListListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
-
         Stage stage =(Stage) nameField.getScene().getWindow();
         FXMLLoader loader= new FXMLLoader(getClass().getResource("MyFriendList.fxml"));
         Parent root= loader.load();
@@ -51,7 +50,18 @@ public class UserProfile {
     public void joinSTreamListener(ActionEvent actionEvent) {
     }
 
-    public void showRequestListener(ActionEvent actionEvent) {
+    public void showRequestListener(ActionEvent actionEvent) throws IOException {
+        Stage stage =(Stage) nameField.getScene().getWindow();
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("MyFriendRequestList.fxml"));
+        Parent root= loader.load();
+        stage.setTitle("Buddy Films-My Friends Request List");
+        //v: width  v1: height
+        stage.setScene(new Scene(root, 460, 410));
+        stage.show();
+
+        //passing message to next GUI controller
+        MyFriendRequestList myFriendRequestList = loader.<MyFriendRequestList>getController();
+        myFriendRequestList.setFields(this.username);
     }
 
     public void setUsername(String username){

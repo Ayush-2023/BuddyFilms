@@ -18,10 +18,6 @@ public class MyFriendList {
     private String[] friends;
     private int index=0;
 
-    private ObjectOutputStream objectOutputStream;
-    private ObjectInputStream objectInputStream;
-    private Socket socket;
-
     public Button visitFriendButton1;
     public Button visitFriendButton2;
     public Button visitFriendButton3;
@@ -40,10 +36,10 @@ public class MyFriendList {
 
     public void setFields(String username) throws IOException, ClassNotFoundException {
         this.setUsername(username);
-        socket = new Socket("localhost", 5436);
+        Socket socket = new Socket("localhost", 5436);
 
-        objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
-        objectInputStream=new ObjectInputStream(socket.getInputStream());
+        ObjectOutputStream objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
+        ObjectInputStream objectInputStream=new ObjectInputStream(socket.getInputStream());
 
         //writing operation
         objectOutputStream.writeObject("Get Friend List");
@@ -65,82 +61,94 @@ public class MyFriendList {
     }
 
     public void visitFriend1Listener(ActionEvent actionEvent) throws IOException {
-        Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-        Parent root= loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
-        stage.show();
+        if (!this.friendNameField1.getText().isEmpty()) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 460, 410));
+            stage.show();
 
-        //passing message to next GUI controller
-        OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-        othersProfileObject.init(this.username,friendNameField1.getText());
+            //passing message to next GUI controller
+            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+            othersProfileObject.init(this.username, friendNameField1.getText());
+        }
     }
     public void visitFriend2Listener(ActionEvent actionEvent) throws IOException {
-        Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-        Parent root= loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
-        stage.show();
+        if (!this.friendNameField2.getText().isEmpty()) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 460, 410));
+            stage.show();
 
-        //passing message to next GUI controller
-        OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-        othersProfileObject.init(this.username,friendNameField2.getText());
+            //passing message to next GUI controller
+            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+            othersProfileObject.init(this.username, friendNameField2.getText());
+        }
     }
     public void visitFriend3Listener(ActionEvent actionEvent) throws IOException {
-        Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-        Parent root= loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
-        stage.show();
+        if (!this.friendNameField3.getText().isEmpty()) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 460, 410));
+            stage.show();
 
-        //passing message to next GUI controller
-        OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-        othersProfileObject.init(this.username,friendNameField3.getText());
+            //passing message to next GUI controller
+            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+            othersProfileObject.init(this.username, friendNameField3.getText());
+        }
     }
     public void visitFriend4Listener(ActionEvent actionEvent) throws IOException {
-        Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-        Parent root= loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
-        stage.show();
+        if (!this.friendNameField4.getText().isEmpty()) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 460, 410));
+            stage.show();
 
-        //passing message to next GUI controller
-        OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-        othersProfileObject.init(this.username,friendNameField4.getText());
+            //passing message to next GUI controller
+            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+            othersProfileObject.init(this.username, friendNameField4.getText());
+        }
     }
     public void visitFriend5Listener(ActionEvent actionEvent) throws IOException {
-        Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-        Parent root= loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
-        stage.show();
+        if (!this.friendNameField5.getText().isEmpty()) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 460, 410));
+            stage.show();
 
-        //passing message to next GUI controller
-        OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-        othersProfileObject.init(this.username,friendNameField5.getText());
+            //passing message to next GUI controller
+            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+            othersProfileObject.init(this.username, friendNameField5.getText());
+        }
     }
     public void visitFriend6Listener(ActionEvent actionEvent) throws IOException {
-        Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-        Parent root= loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
-        stage.show();
+        if (!this.friendNameField6.getText().isEmpty()) {
+            Stage stage = (Stage) backButton.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 460, 410));
+            stage.show();
 
-        //passing message to next GUI controller
-        OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-        othersProfileObject.init(this.username,friendNameField6.getText());
+            //passing message to next GUI controller
+            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+            othersProfileObject.init(this.username, friendNameField6.getText());
+        }
     }
 
     public void goUpListener(ActionEvent actionEvent){
