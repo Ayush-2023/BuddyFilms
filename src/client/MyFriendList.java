@@ -18,20 +18,12 @@ public class MyFriendList {
     private String[] friends;
     private int index=0;
 
-    public Button visitFriendButton1;
-    public Button visitFriendButton2;
-    public Button visitFriendButton3;
-    public Button visitFriendButton4;
-    public Button visitFriendButton5;
-    public Button visitFriendButton6;
     public TextField friendNameField1;
     public TextField friendNameField2;
     public TextField friendNameField3;
     public TextField friendNameField4;
     public TextField friendNameField5;
     public TextField friendNameField6;
-    public Button upButton;
-    public Button downButton;
     public Button backButton;
 
     public void setFields(String username) throws IOException, ClassNotFoundException {
@@ -183,11 +175,35 @@ public class MyFriendList {
     }
 
     public void scrollList(){
-        if(friends.length>index+0)friendNameField1.setText(friends[index+0]);
-        if(friends.length>index+1)friendNameField2.setText(friends[index+1]);
-        if(friends.length>index+2)friendNameField3.setText(friends[index+2]);
-        if(friends.length>index+3)friendNameField4.setText(friends[index+3]);
-        if(friends.length>index+4)friendNameField5.setText(friends[index+4]);
-        if(friends.length>index+5)friendNameField6.setText(friends[index+5]);
+        if(friends.length>index+0){
+            friendNameField1.setText(friends[index+0]);
+        }else{
+            friendNameField1.setText("");
+        }
+        if(friends.length>index+1){
+            friendNameField2.setText(friends[index+1]);
+        }else{
+            friendNameField2.setText("");
+        }
+        if(friends.length>index+2){
+            friendNameField3.setText(friends[index+2]);
+        }else{
+            friendNameField3.setText("");
+        }
+        if(friends.length>index+3){
+            friendNameField4.setText(friends[index+3]);
+        }else{
+            friendNameField4.setText("");
+        }
+        if(friends.length>index+4){
+            friendNameField5.setText(friends[index+4]);
+        }else{
+            friendNameField5.setText("");
+        }
+        if(friends.length>index+5){
+            friendNameField6.setText(friends[index+5]);
+        }else{
+            friendNameField6.setText("");
+        }
     }
 }

@@ -46,11 +46,72 @@ public class HandleClientSocket implements Runnable {
                 case "Get Friend Flags" -> this.returnFriendFlags();
                 case "Unfriend" -> this.unfriendHandler();
                 case "Send Request" -> this.sendRequestHandler();
+                case "Get Request List" -> this.returnRequestList();
+                case "Accept Request" -> this.acceptRequest();
             }
-            //this.closePipes();
+            this.closePipes();
             System.out.println("Client Handled");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void acceptRequest() throws IOException, ClassNotFoundException, SQLException {
+        //reading usernames
+        String username=(String)objectInputStream.readObject();
+        String friend=(String)objectInputStream.readObject();
+
+        //writing sql query
+        String query1="INSERT INTO Friends(Username,Friend) Value(\""+username+
+                "\",\""+friend+"\");";
+        String query2="INSERT INTO Friends(Username,Friend) Value(\""+friend+
+                "\",\""+username+"\");";
+        String query3="DELETE FROM Requests WHERE To_User=\""+username+
+                "\" AND By_USER=\""+friend+"\";";
+
+        PreparedStatement preStat;
+
+        preStat = connection.prepareStatement(query1);
+        objectOutputStream.writeBoolean(preStat.executeUpdate()==1);
+        objectOutputStream.flush();
+        preStat = connection.prepareStatement(query2);
+        objectOutputStream.writeBoolean(preStat.executeUpdate()==1);
+        objectOutputStream.flush();
+        preStat = connection.prepareStatement(query3);
+        objectOutputStream.writeBoolean(preStat.executeUpdate()==1);
+        objectOutputStream.flush();
+    }
+
+    private void returnRequestList() throws IOException, ClassNotFoundException, SQLException {
+        //reading username
+        String username=(String)objectInputStream.readObject();
+
+        //writing sql query
+        String query1="SELECT count(*) FROM Requests WHERE To_User=\""+username+"\";";
+        String query2="SELECT By_User FROM Requests WHERE To_User=\""+username+"\";";
+
+        //setting statement, executing it and storing result in resultSet
+        PreparedStatement preStat = connection.prepareStatement(query1);
+        ResultSet result = preStat.executeQuery();
+
+        //checking if select statement executed successfully
+        if(result.next()){
+            if(result.getInt("count(*)")!=0){
+                objectOutputStream.writeInt(result.getInt("count(*)"));
+                objectOutputStream.flush();
+                preStat = connection.prepareStatement(query2);
+                result = preStat.executeQuery();
+                while(result.next()){
+                    objectOutputStream.writeObject(result.getString("By_User"));
+                    objectOutputStream.flush();
+                }
+            }else{
+                objectOutputStream.writeInt(0);
+                objectOutputStream.flush();
+            }
+        }else{
+            objectOutputStream.writeInt(0);
+            objectOutputStream.flush();
         }
     }
 
