@@ -1,6 +1,5 @@
 package client;
 
-import dataClasses.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -67,7 +66,7 @@ public class MyFriendList {
 
     public void visitFriend1Listener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
         Parent root= loader.load();
         stage.setTitle("Buddy Films");
         //v: width  v1: height
@@ -80,7 +79,7 @@ public class MyFriendList {
     }
     public void visitFriend2Listener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
         Parent root= loader.load();
         stage.setTitle("Buddy Films");
         //v: width  v1: height
@@ -93,7 +92,7 @@ public class MyFriendList {
     }
     public void visitFriend3Listener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
         Parent root= loader.load();
         stage.setTitle("Buddy Films");
         //v: width  v1: height
@@ -106,7 +105,7 @@ public class MyFriendList {
     }
     public void visitFriend4Listener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
         Parent root= loader.load();
         stage.setTitle("Buddy Films");
         //v: width  v1: height
@@ -119,7 +118,7 @@ public class MyFriendList {
     }
     public void visitFriend5Listener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
         Parent root= loader.load();
         stage.setTitle("Buddy Films");
         //v: width  v1: height
@@ -132,7 +131,7 @@ public class MyFriendList {
     }
     public void visitFriend6Listener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) backButton.getScene().getWindow();
-        FXMLLoader loader= new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
         Parent root= loader.load();
         stage.setTitle("Buddy Films");
         //v: width  v1: height

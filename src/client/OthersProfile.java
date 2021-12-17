@@ -26,10 +26,34 @@ public class OthersProfile {
     private ObjectInputStream objectInputStream;
     private Socket socket;
 
-    private boolean friended,sentRequest,receivedRequest;
+    private boolean friended,sentRequest;
 
-    public void unfriendListener(ActionEvent actionEvent) {
+    public void unfriendListener(ActionEvent actionEvent) throws IOException {
+        if(friended){
+            socket = new Socket("localhost", 5436);
 
+            objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream=new ObjectInputStream(socket.getInputStream());
+
+            //writing operation
+            objectOutputStream.writeObject("Unfriend");
+            objectOutputStream.flush();
+            //writing myname,username
+            objectOutputStream.writeObject(this.myname);
+            objectOutputStream.flush();
+            objectOutputStream.writeObject(this.username);
+            objectOutputStream.flush();
+
+            //reading status
+            //for debugging
+            System.out.println("Getting status");
+            if(objectInputStream.readBoolean()&&objectInputStream.readBoolean()){
+                this.friended=false;
+                this.setFlags();
+            }else{
+                System.out.println("Error");
+            }
+        }
     }
 
     public void goBackListener(ActionEvent actionEvent) throws IOException {
@@ -46,22 +70,17 @@ public class OthersProfile {
         userProfileObject.setUsername(this.myname);
     }
 
-    public void setFlags(boolean friended, boolean sentRequest, boolean recievedRequest){
-        this.sentRequest=sentRequest;
-        this.friended=friended;
-        this.receivedRequest=recievedRequest;
+    public void setFlags(){
         if(friended) {
             this.unfriendButton.setText("Unfriend");
             this.requestButton.setText("Already Friends");
-        }if(sentRequest){
-            this.requestButton.setText("Request Sent");
-            this.unfriendButton.setText("Not a Friend");
-        }else if(receivedRequest){
-            this.goBackButton.setText("Request Received");
-            this.unfriendButton.setText("Not a Friend");
         }else{
-            this.goBackButton.setText("Send Request");
             this.unfriendButton.setText("Not a Friend");
+            if(sentRequest){
+                this.requestButton.setText("Request Sent");
+            }else{
+                this.requestButton.setText("Send Request");
+            }
         }
     }
 
@@ -84,6 +103,57 @@ public class OthersProfile {
         objectOutputStream.writeObject(this.username);
         objectOutputStream.flush();
 
+        //reading validity
+        //for debugging
+        System.out.println("Getting Status");
+        boolean valid;
+        valid=objectInputStream.readBoolean();
+        if(valid){
+            this.friended=objectInputStream.readBoolean();
+            if(this.friended){
+                this.sentRequest=false;
+            } else{
+                valid=objectInputStream.readBoolean();
+                if(valid){
+                    this.sentRequest=objectInputStream.readBoolean();
+                }else{
+                    System.out.println("Error");
+                }
+            }
+        }else{
+            System.out.println("Error");
+        }
+        //for debugging
+        System.out.println("Friend :"+friended);
+        System.out.println("Sent Friend Request :"+sentRequest);
+        setFlags();
+    }
 
+    public void handleReqeuestListener(ActionEvent actionEvent) throws IOException {
+        if(!friended&&!sentRequest){
+            socket = new Socket("localhost", 5436);
+
+            objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream=new ObjectInputStream(socket.getInputStream());
+
+            //writing operation
+            objectOutputStream.writeObject("Send Request");
+            objectOutputStream.flush();
+            //writing myname,username
+            objectOutputStream.writeObject(this.myname);
+            objectOutputStream.flush();
+            objectOutputStream.writeObject(this.username);
+            objectOutputStream.flush();
+
+            //reading status
+            //for debugging
+            System.out.println("Getting status");
+            if(objectInputStream.readBoolean()) {
+                this.sentRequest=true;
+                this.setFlags();
+            }else{
+                System.out.println("Error");
+            }
+        }
     }
 }

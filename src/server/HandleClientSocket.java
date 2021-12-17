@@ -44,19 +44,86 @@ public class HandleClientSocket implements Runnable {
                 case "Signup" -> this.signupHandler();
                 case "Get Friend List" -> this.returnFriendList();
                 case "Get Friend Flags" -> this.returnFriendFlags();
+                case "Unfriend" -> this.unfriendHandler();
+                case "Send Request" -> this.sendRequestHandler();
             }
+            this.closePipes();
             System.out.println("Client Handled");
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void returnFriendFlags() throws IOException, ClassNotFoundException {
+    private void sendRequestHandler() throws IOException, ClassNotFoundException, SQLException {
         String username=(String)objectInputStream.readObject();
         String friend=(String)objectInputStream.readObject();
 
         //writing the sql query
+        String query="INSERT INTO Requests(To_User,By_User) value(\""+username+
+                "\",\""+friend+"\");";
+        PreparedStatement preStat = connection.prepareStatement(query);
+        objectOutputStream.writeBoolean(preStat.executeUpdate()==1);
+        objectOutputStream.flush();
+    }
 
+    private void unfriendHandler() throws IOException, ClassNotFoundException, SQLException {
+        String username=(String)objectInputStream.readObject();
+        String friend=(String)objectInputStream.readObject();
+
+        //writing the sql query
+        String query1="DELETE FROM Friends WHERE Username=\""+username+
+                "\" AND Friend=\""+friend+"\";";
+        String query2="DELETE FROM Friends WHERE Username=\""+friend+
+                "\" AND Friend=\""+username+"\";";
+        PreparedStatement preStat = connection.prepareStatement(query1);
+        if(preStat.executeUpdate()==1) {
+            objectOutputStream.writeBoolean(true);
+            objectOutputStream.flush();
+            preStat = connection.prepareStatement(query2);
+            objectOutputStream.writeObject(preStat.executeUpdate() == 1);
+        }else{
+            objectOutputStream.writeBoolean(false);
+        }
+        objectOutputStream.flush();
+    }
+
+    private void returnFriendFlags() throws IOException, ClassNotFoundException, SQLException {
+        String username=(String)objectInputStream.readObject();
+        String friend=(String)objectInputStream.readObject();
+
+        //writing the sql query
+        String query1="SELECT count(*) FROM Friends WHERE Username=\""+username+
+                "\" AND Friend=\""+friend+"\";";
+        String query2="SELECT count(*) FROM Requests WHERE To_User=\""+friend+
+                "\" AND By_User=\""+username+"\";";
+        //setting statement, executing it and storing result in resultSet
+        PreparedStatement preStat = connection.prepareStatement(query1);
+        ResultSet result = preStat.executeQuery();
+
+        //checking if select statement executed successfully
+        if(result.next()){
+            //returns count(*)!=0(ie if friend is related to username or not)  to client
+            objectOutputStream.writeBoolean(true);
+            objectOutputStream.flush();
+            objectOutputStream.writeBoolean(result.getInt("count(*)") != 0);
+            objectOutputStream.flush();
+            if(result.getInt("count(*)")==0) {
+                preStat = connection.prepareStatement(query2);
+                result = preStat.executeQuery();
+                if (result.next()) {
+                    objectOutputStream.writeBoolean(true);
+                    objectOutputStream.flush();
+                    objectOutputStream.writeBoolean(result.getInt("count(*)") != 0);
+                    objectOutputStream.flush();
+                } else {
+                    objectOutputStream.writeBoolean(false);
+                    objectOutputStream.flush();
+                }
+            }
+        }else {
+            objectOutputStream.writeBoolean(false);
+            objectOutputStream.flush();
+        }
     }
 
     public void loginHandler() throws IOException, ClassNotFoundException, SQLException {
@@ -141,5 +208,11 @@ public class HandleClientSocket implements Runnable {
             objectOutputStream.flush();
         }
 
+    }
+
+    public void closePipes() throws IOException {
+        this.objectOutputStream.close();
+        this.objectInputStream.close();
+        this.socket.close();
     }
 }
