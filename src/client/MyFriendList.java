@@ -1,10 +1,16 @@
 package client;
 
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.fxml.Initializable;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
@@ -12,22 +18,24 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.net.URL;
+import java.util.ResourceBundle;
 
-public class MyFriendList {
+public class MyFriendList implements Initializable {
+
+    @FXML
+    private Label headLabel;
+    @FXML
+    private Button backButton;
+    @FXML
+    private ListView listViewItem;
+
     private String username;
     private String[] friends;
-    private int index=0;
-
-    public TextField friendNameField1;
-    public TextField friendNameField2;
-    public TextField friendNameField3;
-    public TextField friendNameField4;
-    public TextField friendNameField5;
-    public TextField friendNameField6;
-    public Button backButton;
 
     public void setFields(String username) throws IOException, ClassNotFoundException {
         this.setUsername(username);
+        this.headLabel.setText(this.username+"'s Friend list");
         Socket socket = new Socket("localhost", 5436);
 
         ObjectOutputStream objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
@@ -48,112 +56,7 @@ public class MyFriendList {
             friends[i]= (String) objectInputStream.readObject();
         }
 
-        this.index=0;
-        this.scrollList();
-    }
-
-    public void visitFriend1Listener(ActionEvent actionEvent) throws IOException {
-        if (!this.friendNameField1.getText().isEmpty()) {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 460, 410));
-            stage.show();
-
-            //passing message to next GUI controller
-            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-            othersProfileObject.init(this.username, friendNameField1.getText());
-        }
-    }
-    public void visitFriend2Listener(ActionEvent actionEvent) throws IOException {
-        if (!this.friendNameField2.getText().isEmpty()) {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 460, 410));
-            stage.show();
-
-            //passing message to next GUI controller
-            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-            othersProfileObject.init(this.username, friendNameField2.getText());
-        }
-    }
-    public void visitFriend3Listener(ActionEvent actionEvent) throws IOException {
-        if (!this.friendNameField3.getText().isEmpty()) {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 460, 410));
-            stage.show();
-
-            //passing message to next GUI controller
-            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-            othersProfileObject.init(this.username, friendNameField3.getText());
-        }
-    }
-    public void visitFriend4Listener(ActionEvent actionEvent) throws IOException {
-        if (!this.friendNameField4.getText().isEmpty()) {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 460, 410));
-            stage.show();
-
-            //passing message to next GUI controller
-            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-            othersProfileObject.init(this.username, friendNameField4.getText());
-        }
-    }
-    public void visitFriend5Listener(ActionEvent actionEvent) throws IOException {
-        if (!this.friendNameField5.getText().isEmpty()) {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 460, 410));
-            stage.show();
-
-            //passing message to next GUI controller
-            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-            othersProfileObject.init(this.username, friendNameField5.getText());
-        }
-    }
-    public void visitFriend6Listener(ActionEvent actionEvent) throws IOException {
-        if (!this.friendNameField6.getText().isEmpty()) {
-            Stage stage = (Stage) backButton.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 460, 410));
-            stage.show();
-
-            //passing message to next GUI controller
-            OthersProfile othersProfileObject = loader.<OthersProfile>getController();
-            othersProfileObject.init(this.username, friendNameField6.getText());
-        }
-    }
-
-    public void goUpListener(ActionEvent actionEvent){
-        if(this.index>0){
-            this.index--;
-            this.scrollList();
-        }
-    }
-    public void goDownListener(ActionEvent actionEvent){
-        if(this.index+5<this.friends.length){
-            this.index++;
-            this.scrollList();
-        }
+        this.listViewItem.getItems().addAll(friends);
     }
 
     public void goBackListener(ActionEvent actionEvent) throws IOException {
@@ -174,36 +77,28 @@ public class MyFriendList {
         this.username=username;
     }
 
-    public void scrollList(){
-        if(friends.length>index+0){
-            friendNameField1.setText(friends[index+0]);
-        }else{
-            friendNameField1.setText("");
-        }
-        if(friends.length>index+1){
-            friendNameField2.setText(friends[index+1]);
-        }else{
-            friendNameField2.setText("");
-        }
-        if(friends.length>index+2){
-            friendNameField3.setText(friends[index+2]);
-        }else{
-            friendNameField3.setText("");
-        }
-        if(friends.length>index+3){
-            friendNameField4.setText(friends[index+3]);
-        }else{
-            friendNameField4.setText("");
-        }
-        if(friends.length>index+4){
-            friendNameField5.setText(friends[index+4]);
-        }else{
-            friendNameField5.setText("");
-        }
-        if(friends.length>index+5){
-            friendNameField6.setText(friends[index+5]);
-        }else{
-            friendNameField6.setText("");
-        }
+    @Override
+    public void initialize(URL url, ResourceBundle resourceBundle) {
+
+        this.listViewItem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                try{
+                    Stage stage = (Stage) backButton.getScene().getWindow();
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("OthersProfile.fxml"));
+                    Parent root = loader.load();
+                    stage.setTitle("Buddy Films");
+                    //v: width  v1: height
+                    stage.setScene(new Scene(root, 460, 410));
+                    stage.show();
+
+                    //passing message to next GUI controller
+                    OthersProfile othersProfileObject = loader.<OthersProfile>getController();
+                    othersProfileObject.init(username,(String)listViewItem.getSelectionModel().getSelectedItem());
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

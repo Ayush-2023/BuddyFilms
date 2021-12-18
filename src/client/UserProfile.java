@@ -17,6 +17,7 @@ import java.net.Socket;
 
 public class UserProfile {
     public Label nameField;
+    public TextField streamCodeFiled;
 
     //these buttons are redundant(no use, except for defining fxml field ids)
     public Button showRequestButton;
@@ -26,7 +27,6 @@ public class UserProfile {
     public Button startStreamButton;
     public Button scheduleStreamButton;
     public Button joinStreamButton;
-    public TextField streamCodeFiled;
 
     private String username;
 
@@ -44,7 +44,7 @@ public class UserProfile {
         Parent root= loader.load();
         stage.setTitle("Buddy Films-My Friends List");
         //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
+        stage.setScene(new Scene(root, 300, 250));
         stage.show();
 
         //passing message to next GUI controller
@@ -59,16 +59,13 @@ public class UserProfile {
     public void scheduleStreamListener(ActionEvent actionEvent) {
     }
 
-    public void joinSTreamListener(ActionEvent actionEvent) {
-    }
-
     public void showRequestListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
         Stage stage =(Stage) nameField.getScene().getWindow();
         FXMLLoader loader= new FXMLLoader(getClass().getResource("MyFriendRequestList.fxml"));
         Parent root= loader.load();
-        stage.setTitle("Buddy Films-My Friends Request List");
+        stage.setTitle("Buddy Films-"+this.username+"'s Request List");
         //v: width  v1: height
-        stage.setScene(new Scene(root, 460, 410));
+        stage.setScene(new Scene(root, 300, 200));
         stage.show();
 
         //passing message to next GUI controller
@@ -84,9 +81,12 @@ public class UserProfile {
     public void logoutListener(ActionEvent actionEvent) throws IOException {
         Stage stage =(Stage) nameField.getScene().getWindow();
         Parent root= FXMLLoader.load(getClass().getResource("LoginGUI.fxml"));
-        stage.setTitle("Buddy Films-My Friends Request List");
+        stage.setTitle("Buddy Films-"+this.username+"'s Friends Request List");
         //v: width  v1: height
         stage.setScene(new Scene(root, 460, 410));
         stage.show();
+    }
+
+    public void joinSecretStreamListener(ActionEvent actionEvent) {
     }
 }

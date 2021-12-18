@@ -1,5 +1,6 @@
 package client;
 
+import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -10,8 +11,10 @@ import javafx.event.ActionEvent;
 import java.io.IOException;
 
 public class FailureGUI {
-    public Button retryButton;
-    public Label failureMessageLabel;
+    @FXML
+    private Button retryButton;
+    @FXML
+    private Label failureMessageLabel;
 
     public void retryHandler(ActionEvent actionEvent){
         try{
