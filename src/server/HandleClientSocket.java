@@ -48,11 +48,48 @@ public class HandleClientSocket implements Runnable {
                 case "Send Request" -> this.sendRequestHandler();
                 case "Get Request List" -> this.returnRequestList();
                 case "Accept Request" -> this.acceptRequest();
+                case "Search Users" -> this.searchUsersHandler();
             }
             this.closePipes();
             System.out.println("Client Handled");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void searchUsersHandler() throws IOException, ClassNotFoundException, SQLException {
+        //reading pattern
+        String username=(String)objectInputStream.readObject();
+        String pattern=(String)objectInputStream.readObject();
+
+        //writing sql query
+        String query1="SELECT count(*) FROM Users WHERE Username LIKE \"%"+pattern+
+                "%\" AND Username!=\""+username+"\";";
+        String query2="SELECT Username FROM Users WHERE Username LIKE \"%"+pattern+
+                "%\" AND Username!=\""+username+"\";";
+
+        //setting statement, executing it and storing result in resultSet
+        PreparedStatement preStat = connection.prepareStatement(query1);
+        ResultSet result = preStat.executeQuery();
+
+        //checking if select statement executed successfully
+        if(result.next()){
+            if(result.getInt("count(*)")!=0){
+                objectOutputStream.writeInt(result.getInt("count(*)"));
+                objectOutputStream.flush();
+                preStat = connection.prepareStatement(query2);
+                result = preStat.executeQuery();
+                while(result.next()){
+                    objectOutputStream.writeObject(result.getString("Username"));
+                    objectOutputStream.flush();
+                }
+            }else{
+                objectOutputStream.writeInt(0);
+                objectOutputStream.flush();
+            }
+        }else{
+            objectOutputStream.writeInt(0);
+            objectOutputStream.flush();
         }
     }
 

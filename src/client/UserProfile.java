@@ -34,8 +34,23 @@ public class UserProfile {
     private ObjectInputStream objectInputStream;
     private Socket socket;
 
-    public void lookFriendListener(ActionEvent actionEvent) {
+    public void setUsername(String username){
+        this.nameField.setText(username);
+        this.username=username;
+    }
 
+    public void lookFriendListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
+        Stage stage =(Stage) nameField.getScene().getWindow();
+        FXMLLoader loader= new FXMLLoader(getClass().getResource("LookForFriends.fxml"));
+        Parent root= loader.load();
+        stage.setTitle("Buddy Films-Look For Friends");
+        //v: width  v1: height
+        stage.setScene(new Scene(root, 350, 350));
+        stage.show();
+
+        //passing message to next GUI controller
+        LookForFriends lookForFriendsController = loader.<LookForFriends>getController();
+        lookForFriendsController.setFields(this.username);
     }
 
     public void showFriendListListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
@@ -71,11 +86,6 @@ public class UserProfile {
         //passing message to next GUI controller
         MyFriendRequestList myFriendRequestList = loader.<MyFriendRequestList>getController();
         myFriendRequestList.setFields(this.username);
-    }
-
-    public void setUsername(String username){
-        this.nameField.setText(username);
-        this.username=username;
     }
 
     public void logoutListener(ActionEvent actionEvent) throws IOException {

@@ -34,7 +34,7 @@ public class MyFriendList implements Initializable {
     private String[] friends;
 
     public void setFields(String username) throws IOException, ClassNotFoundException {
-        this.setUsername(username);
+        this.username=username;
         this.headLabel.setText(this.username+"'s Friend list");
         Socket socket = new Socket("localhost", 5436);
 
@@ -71,10 +71,6 @@ public class MyFriendList implements Initializable {
         //passing message to next GUI controller
         UserProfile userProfileObject = loader.<UserProfile>getController();
         userProfileObject.setUsername(this.username);
-    }
-
-    public void setUsername(String username) {
-        this.username=username;
     }
 
     @Override
