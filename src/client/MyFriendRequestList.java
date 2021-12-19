@@ -2,7 +2,10 @@ package client;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -10,18 +13,22 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
+import javafx.util.Callback;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 public class MyFriendRequestList implements Initializable {
     @FXML
     private ListView listViewItem;
+    private ObservableList<String> userList;
     @FXML
     private Label headLabel;
 
@@ -68,46 +75,98 @@ public class MyFriendRequestList implements Initializable {
         for(int i=0;i<size;i++){
             requests[i]= (String) objectInputStream.readObject();
         }
-
+        System.out.println(size);
+        this.userList = FXCollections.observableArrayList();
+        this.userList.clear();
+        this.userList.addAll(requests);
         this.listViewItem.getItems().clear();
-        this.listViewItem.getItems().addAll(requests);
+        this.listViewItem.setItems(userList);
     }
 
+    public void rejectListener(String myName,String username){
+        //for debugging
+        System.out.println(myName+"||"+username);
+        try{
+            socket = new Socket("localhost", 5436);
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+            //writing operation
+            objectOutputStream.writeObject("Reject Request");
+            objectOutputStream.flush();
+            //writing object
+            objectOutputStream.writeObject(myName);
+            objectOutputStream.flush();
+            objectOutputStream.writeObject(username);
+            objectOutputStream.flush();
+
+            //reading status
+            System.out.println("Getting status");
+            //status of 2 deletion and one insertion
+            if (objectInputStream.readBoolean()) {
+                System.out.println("Request Rejected");
+                setFields(myName);
+            } else {
+                System.out.println("Error");
+            }
+        }catch(IOException | ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
+    public  void acceptListener(String myName,String username){
+        //for debugging
+        System.out.println(myName+"||"+username);
+        try {
+            socket = new Socket("localhost", 5436);
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+            //writing operation
+            objectOutputStream.writeObject("Accept Request");
+            objectOutputStream.flush();
+            //writing object
+            objectOutputStream.writeObject(myName);
+            objectOutputStream.flush();
+            objectOutputStream.writeObject(username);
+            objectOutputStream.flush();
+
+            //reading status
+            System.out.println("Getting status");
+            //status of 2 deletion and one insertion
+            if (objectInputStream.readBoolean() && objectInputStream.readBoolean() && objectInputStream.readBoolean()) {
+                System.out.println("Request Accepted");
+                setFields(myName);
+            } else {
+                System.out.println("Error");
+            }
+        }catch(IOException | ClassNotFoundException e){
+            e.printStackTrace();
+        }
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
 
-        this.listViewItem.getSelectionModel().selectedItemProperty().addListener(new ChangeListener() {
-
-            @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-
-                try {
-                    socket = new Socket("localhost", 5436);
-                    objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
-                    objectInputStream = new ObjectInputStream(socket.getInputStream());
-
-                    //writing operation
-                    objectOutputStream.writeObject("Accept Request");
-                    objectOutputStream.flush();
-                    //writing object
-                    objectOutputStream.writeObject(username);
-                    objectOutputStream.flush();
-                    objectOutputStream.writeObject((String)listViewItem.getSelectionModel().getSelectedItem());
-                    objectOutputStream.flush();
-
-                    //reading status
-                    System.out.println("Getting status");
-                    //status of 2 deletion and one insertion
-                    if (objectInputStream.readBoolean() && objectInputStream.readBoolean() && objectInputStream.readBoolean()) {
-                        System.out.println("Request Accepted");
-                        setFields(username);
-                    } else {
-                        System.out.println("Error");
+        this.listViewItem.setCellFactory((Callback<ListView<String>,ListCell<String>>) param ->{
+            return new ListCell<String>() {
+                @Override
+                protected void updateItem(String user, boolean empty){
+                    super.updateItem(user,empty);
+                    if(user!=null) {
+                        Button rejectButton = new Button("Reject");
+                        Button acceptButton = new Button("Accept");
+                        rejectButton.setOnAction(actionEvent -> {
+                            rejectListener(username, user);
+                        });
+                        acceptButton.setOnAction(actionEvent -> {
+                            acceptListener(username, user);
+                        });
+                        HBox root = new HBox(10);
+                        root.getChildren().addAll(new Label(user), acceptButton, rejectButton);
+                        setText(null);
+                        setGraphic(root);
                     }
-                }catch(IOException | ClassNotFoundException e){
-                    e.printStackTrace();
                 }
-            }
+            };
         });
     }
 }

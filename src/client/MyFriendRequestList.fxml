@@ -18,6 +18,6 @@
          <font>
             <Font name="Arial Rounded MT Bold" size="18.0" />
          </font></Label>
-      <Button fx:id="backButton" layoutX="246.0" layoutY="10.0" mnemonicParsing="false" onAction="#goBackListener" text="Back" />
+      <Button fx:id="cbackButton" layoutX="246.0" layoutY="10.0" mnemonicParsing="false" onAction="#goBackListener" text="Back" />
    </children>
 </AnchorPane>

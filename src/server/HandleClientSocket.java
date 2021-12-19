@@ -49,12 +49,29 @@ public class HandleClientSocket implements Runnable {
                 case "Get Request List" -> this.returnRequestList();
                 case "Accept Request" -> this.acceptRequest();
                 case "Search Users" -> this.searchUsersHandler();
+                case "Reject Request" -> this.rejectRequest();
             }
             this.closePipes();
             System.out.println("Client Handled");
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+
+    private void rejectRequest() throws IOException, ClassNotFoundException, SQLException {
+        //reading usernames
+        String username=(String)objectInputStream.readObject();
+        String friend=(String)objectInputStream.readObject();
+
+        //writing sql query
+        String query="DELETE FROM Requests WHERE To_User=\""+username+
+                "\" AND By_USER=\""+friend+"\";";
+
+        PreparedStatement preStat;
+
+        preStat = connection.prepareStatement(query);
+        objectOutputStream.writeBoolean(preStat.executeUpdate()==1);
+        objectOutputStream.flush();
     }
 
     private void searchUsersHandler() throws IOException, ClassNotFoundException, SQLException {
