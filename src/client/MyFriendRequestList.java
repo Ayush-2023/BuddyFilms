@@ -55,7 +55,7 @@ public class MyFriendRequestList implements Initializable {
 
     public void setFields(String username) throws IOException, ClassNotFoundException {
         this.username=username;
-        this.headLabel.setText("Friend Request");
+        this.headLabel.setText("Received Requests");
         socket = new Socket("localhost", 5436);
 
         objectOutputStream=new ObjectOutputStream(socket.getOutputStream());

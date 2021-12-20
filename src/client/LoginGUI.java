@@ -9,6 +9,9 @@ import javafx.scene.Scene;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import utilityClasses.BlowFishEncryption;
+import utilityClasses.InvalidInputException;
+
 import java.io.IOException;
 
 import java.net.Socket;
@@ -50,8 +53,19 @@ public class LoginGUI extends Application {
 
         objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
         objectInputStream=new ObjectInputStream(socket.getInputStream());
+        try {
+            user = new User(usernameField.getText(), new BlowFishEncryption().encryptData(passwordField.getText()));
+        }catch(InvalidInputException e){
+            Stage stage =(Stage) usernameField.getScene().getWindow();
+            FXMLLoader loader= new FXMLLoader(getClass().getResource("FailureGUI.fxml"));
+            Parent root=loader.load();
+            stage.setTitle("Login Failure");
+            stage.setScene(new Scene(root, 300, 200));
+            stage.show();
 
-        user=new User(usernameField.getText(),passwordField.getText());
+            FailureGUI failureGUIObject=loader.<FailureGUI>getController();
+            failureGUIObject.setFailureMessageLabel(e.getMessage());
+        }
         //writing operation
         objectOutputStream.writeObject("Login");
         objectOutputStream.flush();

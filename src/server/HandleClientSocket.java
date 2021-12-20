@@ -27,7 +27,7 @@ public class HandleClientSocket implements Runnable {
         objectInputStream=new ObjectInputStream(socket.getInputStream());
         objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
         Class.forName("com.mysql.jdbc.Driver");
-        String url = "jdbc:mysql://localhost:3306/streamapp?autoReconnect=false&useSSL=false";
+        String url = "jdbc:mysql://localhost:3306/streamapp?autoReconnect=true&useSSL=false";
         this.connection = DriverManager.getConnection(url, "root", "TetraM0s");
     }
 
