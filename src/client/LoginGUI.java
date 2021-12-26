@@ -32,7 +32,7 @@ public class LoginGUI extends Application {
     public void start(Stage primaryStage) throws Exception{
         Parent root = FXMLLoader.load(getClass().getResource("LoginGUI.fxml"));
         primaryStage.setTitle("Buddy Films-Login");
-        primaryStage.setScene(new Scene(root, 400, 350));
+        primaryStage.setScene(new Scene(root, 380, 350));
         primaryStage.show();
     }
 
@@ -85,7 +85,7 @@ public class LoginGUI extends Application {
                 Parent root= loader.load();
                 stage.setTitle("Buddy Films");
                 //v: width  v1: height
-                stage.setScene(new Scene(root, 460, 410));
+                stage.setScene(new Scene(root, 460, 360));
                 stage.show();
 
                 //passing message to next GUI controller

@@ -6,6 +6,8 @@ import java.net.Socket;
 import java.sql.SQLException;
 
 public class DatabaseServer {
+
+
     public static void main(String[] args) throws SQLException, ClassNotFoundException {
         ServerSocket serverSocket;
         Socket socket;

@@ -3,6 +3,7 @@ package server;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.net.ServerSocket;
 import java.net.Socket;
 
 import java.sql.Connection;
@@ -21,6 +22,9 @@ public class HandleClientSocket implements Runnable {
     private ObjectInputStream objectInputStream;
     private Connection connection;
 
+    private StreamServer2 streamServer2;
+    private Boolean streaming;
+
     public HandleClientSocket(Socket socket) throws IOException, ClassNotFoundException, SQLException {
         this.socket=socket;
         user=new User();
@@ -29,6 +33,7 @@ public class HandleClientSocket implements Runnable {
         Class.forName("com.mysql.jdbc.Driver");
         String url = "jdbc:mysql://localhost:3306/streamapp?autoReconnect=true&useSSL=false";
         this.connection = DriverManager.getConnection(url, "root", "TetraM0s");
+        streaming=false;
     }
 
     @Override
@@ -50,11 +55,54 @@ public class HandleClientSocket implements Runnable {
                 case "Accept Request" -> this.acceptRequest();
                 case "Search Users" -> this.searchUsersHandler();
                 case "Reject Request" -> this.rejectRequest();
+                case "Start Stream" -> this.startStream();
+                case "Join Stream" -> this.joinStream();
             }
             this.closePipes();
             System.out.println("Client Handled");
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+
+    private void joinStream() throws IOException, ClassNotFoundException {
+        String host=(String)objectInputStream.readObject();
+        int port=objectInputStream.readInt();
+//        Thread handleJoinRequest=new Thread(new StreamServer(socket,host));
+//        handleJoinRequest.start();
+    }
+
+    private void startStream() throws IOException, ClassNotFoundException, SQLException {
+        //sending port number
+        objectOutputStream.writeInt(20000);
+        objectOutputStream.flush();
+        streamServer2=new StreamServer2(objectOutputStream,objectInputStream,20000);
+
+        try{
+            ServerSocket serverSocket=new ServerSocket(20000);
+            synchronized (this.streaming) {
+                this.streaming = true;
+                new Thread(new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            while (streaming) {
+                                streaming = (Boolean) objectInputStream.readObject();
+                            }
+                        } catch (ClassNotFoundException | IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).start();
+                while (streaming) {
+                    Socket socket = serverSocket.accept();
+                    new Thread(new StreamServer(socket, streamServer2)).start();
+                }
+            }
+        }catch(IOException e){
+            e.printStackTrace();
+        }finally {
+            this.streamServer2.exitStream(objectOutputStream);
         }
     }
 
@@ -229,11 +277,10 @@ public class HandleClientSocket implements Runnable {
                     objectOutputStream.writeBoolean(true);
                     objectOutputStream.flush();
                     objectOutputStream.writeBoolean(result.getInt("count(*)") != 0);
-                    objectOutputStream.flush();
                 } else {
                     objectOutputStream.writeBoolean(false);
-                    objectOutputStream.flush();
                 }
+                objectOutputStream.flush();
             }
         }else {
             objectOutputStream.writeBoolean(false);

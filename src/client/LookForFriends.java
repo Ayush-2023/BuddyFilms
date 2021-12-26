@@ -50,7 +50,7 @@ public class LookForFriends implements Initializable {
                     Parent root = loader.load();
                     stage.setTitle("Buddy Films");
                     //v: width  v1: height
-                    stage.setScene(new Scene(root, 460, 410));
+                    stage.setScene(new Scene(root, 300, 200));
                     stage.show();
 
                     //passing message to next GUI controller

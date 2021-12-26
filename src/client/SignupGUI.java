@@ -76,7 +76,7 @@ public class SignupGUI {
             Parent root = FXMLLoader.load(getClass().getResource("LoginGUI.fxml"));
             stage.setTitle("Buddy Films-Login");
             //v: width  v1: height
-            stage.setScene(new Scene(root, 400, 350));
+            stage.setScene(new Scene(root, 380, 350));
             stage.show();
         }else{
             Stage stage =(Stage) usernameField.getScene().getWindow();

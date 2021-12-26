@@ -33,6 +33,7 @@ public class UserProfile {
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private Socket socket;
+    private Boolean streaming;
 
     public void setUsername(String username){
         this.nameField.setText(username);
@@ -67,8 +68,55 @@ public class UserProfile {
         myFriendList.setFields(this.username);
     }
 
-    public void startStreamListener(ActionEvent actionEvent) {
+    public void startStreamListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
+        int code=0;
 
+        SettingGUIForHost:{
+            Stage stage = (Stage) nameField.getScene().getWindow();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("StreamingGUI.fxml"));
+            Parent root = loader.load();
+            stage.setTitle("Buddy Films");
+            //v: width  v1: height
+            stage.setScene(new Scene(root, 600, 480));
+            stage.show();
+            //giving input for the video to be played
+            StreamingGUI streamingGUIObject = loader.<StreamingGUI>getController();
+            streamingGUIObject.setMedia("E:\\Videos\\Movies\\23m_1613182452_8810.mp4");
+        }
+        CommunicateWithServer:{
+            //Creating stream entry in database server
+            socket = new Socket("localhost", 5436);
+
+            objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+            objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+            //writing operation
+            objectOutputStream.writeObject("Start Stream");
+            objectOutputStream.flush();
+            code=objectInputStream.readInt();
+
+        }
+        try {
+            Thread createFrame = new Thread(new CreateFrame(objectInputStream,objectOutputStream,username));
+            createFrame.start();
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+        synchronized (this.streaming) {
+            this.streaming = true;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        while (streaming) {
+                            objectOutputStream.writeObject((Boolean) true);
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+        }
     }
 
     public void scheduleStreamListener(ActionEvent actionEvent) {
@@ -98,5 +146,7 @@ public class UserProfile {
     }
 
     public void joinSecretStreamListener(ActionEvent actionEvent) {
+
+
     }
 }
