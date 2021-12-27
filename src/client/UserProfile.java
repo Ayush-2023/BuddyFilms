@@ -110,7 +110,7 @@ public class UserProfile {
                 @Override
                 public void run() {
                     try{
-                        Thread.sleep(120000);
+                        Thread.sleep(1000);
                         //Thread.sleep(100);
                     }catch (InterruptedException e){
                         e.getMessage();
@@ -164,7 +164,8 @@ public class UserProfile {
 
         objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         objectInputStream = new ObjectInputStream(socket.getInputStream());
-
+        objectOutputStream.writeObject(Integer.parseInt(this.streamCodeFiled.getText()));
+        objectOutputStream.flush();
         Boolean status;
         while(true){
             status=(Boolean)objectInputStream.readObject();

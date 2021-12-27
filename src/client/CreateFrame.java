@@ -16,6 +16,8 @@ public class CreateFrame implements Runnable {
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private StatusData streaming;
+    private WritableImage canvas;
+    private Robot robot;
 
 
     CreateFrame(StatusData streaming,
@@ -26,10 +28,12 @@ public class CreateFrame implements Runnable {
         this.objectInputStream=in;
         this.objectOutputStream=out;
         this.username=username;
+        this.canvas=new WritableImage(1,1);
+        this.robot=new Robot();
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         try{
             //writing username and size
             objectOutputStream.writeObject(this.username);
@@ -37,26 +41,28 @@ public class CreateFrame implements Runnable {
             objectOutputStream.writeInt(100);
             objectOutputStream.flush();
             File imageFile=new File("E:\\Pictures\\pic1.jpg");
-            for(int i=0;i<100&&streaming.getStatus();i++){
-                System.out.println("Sending Status true and image");
-                objectOutputStream.writeObject(Boolean.valueOf(true));
-                objectOutputStream.flush();
-                System.out.print("Hello " );
-//                WritableImage canvas = new WritableImage(200,200);
-//                javafx.scene.robot.Robot robot = new Robot();
-//                WritableImage imgReturn = robot.getScreenCapture(canvas, new Rectangle2D(0,0,200,200));
-//                ImageIO.write((RenderedImage) imgReturn,"jpg",imageFile);
-                System.out.println("World");
-                objectOutputStream.writeObject(imageFile);
-                objectOutputStream.flush();
-                System.out.println("Image sent");
-                try{
-                    Thread.sleep(1);
-                }catch (InterruptedException e){
-                    e.getMessage();
+            int i;
+            synchronized (streaming) {
+                for (i = 0; (i < 100 )&(streaming.getStatus()); i++) {
+                    System.out.println("Sending Status true and image");
+                    objectOutputStream.writeBoolean(true);
+                    objectOutputStream.flush();
+                    System.out.print("Hello ");
+//                    WritableImage imgReturn = robot.getScreenCapture(canvas, new Rectangle2D(0,0,1,1));
+//                    System.out.println("World");
+//                    ImageIO.write((RenderedImage) imgReturn,"jpg",imageFile);
+                    objectOutputStream.writeObject(imageFile);
+                    objectOutputStream.flush();
+                    System.out.println("Image sent");
+                    try {
+                        Thread.sleep(10);
+                    } catch (InterruptedException e) {
+                        e.getMessage();
+                    }
                 }
             }
-            objectOutputStream.writeObject(Boolean.valueOf(false));
+            System.out.println(i+"-->Sending end signal");
+            objectOutputStream.writeBoolean(false);
             objectOutputStream.flush();
 
         }catch (Exception e){

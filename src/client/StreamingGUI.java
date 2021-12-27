@@ -38,6 +38,7 @@ public class StreamingGUI{
 
     public void stopAndPlayLitener(ActionEvent actionEvent) {
         mediaPlayer.stop();
+        paused=true;
     }
 
     public void pauseAndResumeListener(ActionEvent actionEvent) {
