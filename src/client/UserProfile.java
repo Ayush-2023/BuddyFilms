@@ -110,7 +110,7 @@ public class UserProfile {
                 @Override
                 public void run() {
                     try{
-                        Thread.sleep(1000);
+                        Thread.sleep(12000);
                         //Thread.sleep(100);
                     }catch (InterruptedException e){
                         e.getMessage();
@@ -159,31 +159,38 @@ public class UserProfile {
         stage.setScene(new Scene(root, 600, 480));
         stage.show();
 
-        //Creating stream entry in database server
+        JoinStreamGUI joinStreamGUIObject=loader.<JoinStreamGUI>getController();
+        joinStreamGUIObject.setUsername(username);
         socket = new Socket("localhost", Integer.parseInt(this.streamCodeFiled.getText()));
 
         objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
         objectInputStream = new ObjectInputStream(socket.getInputStream());
-        objectOutputStream.writeObject(Integer.parseInt(this.streamCodeFiled.getText()));
+        objectOutputStream.writeInt(Integer.parseInt(this.streamCodeFiled.getText()));
         objectOutputStream.flush();
-        Boolean status;
-        while(true){
-            status=(Boolean)objectInputStream.readObject();
-            if(status){
-
-            }else{
-                break;
+        StatusData data=new StatusData();
+        data.setStatus(true);
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                synchronized (data) {
+                    Boolean status;
+                    joinStreamGUIObject.setStatus(data);
+                    try {
+                        while (true) {
+                            status = objectInputStream.readBoolean();
+                            if (status && data.getStatus()) {
+                                File imageFile = (File) objectInputStream.readObject();
+                                joinStreamGUIObject.setImageViewItem(imageFile);
+                            } else {
+                                break;
+                            }
+                        }
+                    }catch (IOException | ClassNotFoundException e){
+                        e.printStackTrace();
+                    }
+                }
             }
-        }
-        stage = (Stage) nameField.getScene().getWindow();
-        loader = new FXMLLoader(getClass().getResource("UserProfile.fxml"));
-        root = loader.load();
-        stage.setTitle("Buddy Films");
-        //v: width  v1: height
-        stage.setScene(new Scene(root, 600, 480));
-        stage.show();
+        }).start();
 
-        UserProfile userProfile=loader.<UserProfile>getController();
-        userProfile.setUsername(username);
     }
 }
