@@ -1,53 +1,63 @@
 package client;
 
-import javafx.scene.image.Image;
+import dataClasses.StatusData;
+import javafx.geometry.Rectangle2D;
+import javafx.scene.image.WritableImage;
+import javafx.scene.robot.Robot;
 
-import java.io.*;
-import java.net.Socket;
-import java.util.Objects;
+import javax.imageio.ImageIO;
+import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.ObjectOutputStream;
+import java.io.ObjectInputStream;
 
 public class CreateFrame implements Runnable {
     private String username;
-    private File imageDir;
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
+    private StatusData streaming;
 
-    CreateFrame(ObjectInputStream objectInputStream,ObjectOutputStream objectOutputStream,
-                String username) throws IOException {
-        this(new String("E:\\Pictures\\New folder"),objectInputStream,objectOutputStream,username);
-    }
 
-    CreateFrame(String directory,ObjectInputStream objectInputStream,ObjectOutputStream objectOutputStream,
-               String username) throws IOException {
-        this.imageDir=new File(directory);
-        this.objectInputStream=objectInputStream;
-        this.objectOutputStream=objectOutputStream;
+    CreateFrame(StatusData streaming,
+                ObjectInputStream in,ObjectOutputStream out,
+                String username)
+    {
+        this.streaming=streaming;
+        this.objectInputStream=in;
+        this.objectOutputStream=out;
+        this.username=username;
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         try{
-            //writing username
+            //writing username and size
             objectOutputStream.writeObject(this.username);
             objectOutputStream.flush();
-            if(this.imageDir.isDirectory()) {
-                objectOutputStream.writeInt(Objects.requireNonNull(this.imageDir.list()).length);
+            objectOutputStream.writeInt(100);
+            objectOutputStream.flush();
+            File imageFile=new File("E:\\Pictures\\pic1.jpg");
+            for(int i=0;i<100&&streaming.getStatus();i++){
+                System.out.println("Sending Status true and image");
+                objectOutputStream.writeObject(Boolean.valueOf(true));
                 objectOutputStream.flush();
-                for(File file: Objects.requireNonNull(imageDir.listFiles())){
-                    objectOutputStream.writeObject(file);
-                    objectOutputStream.flush();
+                System.out.print("Hello " );
+//                WritableImage canvas = new WritableImage(200,200);
+//                javafx.scene.robot.Robot robot = new Robot();
+//                WritableImage imgReturn = robot.getScreenCapture(canvas, new Rectangle2D(0,0,200,200));
+//                ImageIO.write((RenderedImage) imgReturn,"jpg",imageFile);
+                System.out.println("World");
+                objectOutputStream.writeObject(imageFile);
+                objectOutputStream.flush();
+                System.out.println("Image sent");
+                try{
+                    Thread.sleep(1);
+                }catch (InterruptedException e){
+                    e.getMessage();
                 }
             }
-
-            //reading status
-            //for debugging
-            System.out.println("Getting status");
-            if(objectInputStream.readBoolean()) {
-                System.out.println("Successfully transferred all the files");
-            }else{
-                System.out.println("Error");
-            }
-
+            objectOutputStream.writeObject(Boolean.valueOf(false));
+            objectOutputStream.flush();
 
         }catch (Exception e){
             e.getMessage();

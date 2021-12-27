@@ -1,5 +1,6 @@
 package client;
 
+import dataClasses.StatusData;
 import dataClasses.User;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXMLLoader;
@@ -10,10 +11,12 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
+import java.sql.Blob;
 
 public class UserProfile {
     public Label nameField;
@@ -33,7 +36,6 @@ public class UserProfile {
     private ObjectOutputStream objectOutputStream;
     private ObjectInputStream objectInputStream;
     private Socket socket;
-    private Boolean streaming;
 
     public void setUsername(String username){
         this.nameField.setText(username);
@@ -70,19 +72,18 @@ public class UserProfile {
 
     public void startStreamListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
         int code=0;
-
-        SettingGUIForHost:{
-            Stage stage = (Stage) nameField.getScene().getWindow();
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("StreamingGUI.fxml"));
-            Parent root = loader.load();
-            stage.setTitle("Buddy Films");
-            //v: width  v1: height
-            stage.setScene(new Scene(root, 600, 480));
-            stage.show();
-            //giving input for the video to be played
-            StreamingGUI streamingGUIObject = loader.<StreamingGUI>getController();
-            streamingGUIObject.setMedia("E:\\Videos\\Movies\\23m_1613182452_8810.mp4");
-        }
+        StatusData streaming=new StatusData();
+        Stage stage = (Stage) nameField.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("StreamingGUI.fxml"));
+        Parent root = loader.load();
+        stage.setTitle("Buddy Films");
+        //v: width  v1: height
+        stage.setFullScreen(true);
+        stage.setScene(new Scene(root, 600, 480));
+        stage.show();
+        //giving input for the video to be played
+        StreamingGUI streamingGUIObject = loader.<StreamingGUI>getController();
+        streamingGUIObject.setMedia("E:\\Videos\\Movies\\23m_1613182452_8810.mp4");
         CommunicateWithServer:{
             //Creating stream entry in database server
             socket = new Socket("localhost", 5436);
@@ -94,30 +95,33 @@ public class UserProfile {
             objectOutputStream.writeObject("Start Stream");
             objectOutputStream.flush();
             code=objectInputStream.readInt();
+            streamingGUIObject.setCode(String.valueOf(code));
+        }
+        synchronized (streaming){
 
-        }
-        try {
-            Thread createFrame = new Thread(new CreateFrame(objectInputStream,objectOutputStream,username));
+            streaming.setStatus(true);
+            streamingGUIObject.setStatus(streaming);
+            //thread for taking snapshots
+            Thread createFrame = new Thread(new CreateFrame(streaming,objectInputStream,objectOutputStream,username));
             createFrame.start();
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-        synchronized (this.streaming) {
-            this.streaming = true;
+
+            //time scheduled streaming
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    try {
-                        while (streaming) {
-                            objectOutputStream.writeObject((Boolean) true);
-                        }
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                    try{
+                        Thread.sleep(120000);
+                        //Thread.sleep(100);
+                    }catch (InterruptedException e){
+                        e.getMessage();
+                    }finally {
+                        streaming.setStatus(false);
                     }
                 }
             }).start();
         }
     }
+
 
     public void scheduleStreamListener(ActionEvent actionEvent) {
     }
@@ -145,8 +149,40 @@ public class UserProfile {
         stage.show();
     }
 
-    public void joinSecretStreamListener(ActionEvent actionEvent) {
+    public void joinSecretStreamListener(ActionEvent actionEvent) throws IOException, ClassNotFoundException {
+        String username=this.nameField.getText();
+        Stage stage = (Stage) nameField.getScene().getWindow();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("JoinStreamGUI.fxml"));
+        Parent root = loader.load();
+        stage.setTitle("Buddy Films");
+        //v: width  v1: height
+        stage.setScene(new Scene(root, 600, 480));
+        stage.show();
 
+        //Creating stream entry in database server
+        socket = new Socket("localhost", Integer.parseInt(this.streamCodeFiled.getText()));
 
+        objectOutputStream = new ObjectOutputStream(socket.getOutputStream());
+        objectInputStream = new ObjectInputStream(socket.getInputStream());
+
+        Boolean status;
+        while(true){
+            status=(Boolean)objectInputStream.readObject();
+            if(status){
+
+            }else{
+                break;
+            }
+        }
+        stage = (Stage) nameField.getScene().getWindow();
+        loader = new FXMLLoader(getClass().getResource("UserProfile.fxml"));
+        root = loader.load();
+        stage.setTitle("Buddy Films");
+        //v: width  v1: height
+        stage.setScene(new Scene(root, 600, 480));
+        stage.show();
+
+        UserProfile userProfile=loader.<UserProfile>getController();
+        userProfile.setUsername(username);
     }
 }

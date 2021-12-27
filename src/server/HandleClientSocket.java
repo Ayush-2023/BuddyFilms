@@ -1,8 +1,6 @@
 package server;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -12,7 +10,9 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
+import dataClasses.StatusData;
 import dataClasses.User;
+import javafx.scene.image.WritableImage;
 
 public class HandleClientSocket implements Runnable {
     private User user;
@@ -56,7 +56,6 @@ public class HandleClientSocket implements Runnable {
                 case "Search Users" -> this.searchUsersHandler();
                 case "Reject Request" -> this.rejectRequest();
                 case "Start Stream" -> this.startStream();
-                case "Join Stream" -> this.joinStream();
             }
             this.closePipes();
             System.out.println("Client Handled");
@@ -65,44 +64,86 @@ public class HandleClientSocket implements Runnable {
         }
     }
 
-    private void joinStream() throws IOException, ClassNotFoundException {
-        String host=(String)objectInputStream.readObject();
-        int port=objectInputStream.readInt();
-//        Thread handleJoinRequest=new Thread(new StreamServer(socket,host));
-//        handleJoinRequest.start();
-    }
-
     private void startStream() throws IOException, ClassNotFoundException, SQLException {
-        //sending port number
-        objectOutputStream.writeInt(20000);
-        objectOutputStream.flush();
-        streamServer2=new StreamServer2(objectOutputStream,objectInputStream,20000);
-
-        try{
-            ServerSocket serverSocket=new ServerSocket(20000);
-            synchronized (this.streaming) {
-                this.streaming = true;
-                new Thread(new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            while (streaming) {
-                                streaming = (Boolean) objectInputStream.readObject();
-                            }
-                        } catch (ClassNotFoundException | IOException e) {
-                            e.printStackTrace();
+        StatusData streaming=new StatusData();
+        synchronized (streaming) {
+            //thread for handling join Stream
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        ServerSocket serverSocket = new ServerSocket(20000);
+                        while (streaming.getStatus()) {
+                            Socket socket = serverSocket.accept();
+                            //
+                            new Thread(new StreamServer(socket, streamServer2)).start();
                         }
+                        serverSocket.close();
+                    }catch(IOException e){
+                        e.printStackTrace();
                     }
-                }).start();
-                while (streaming) {
-                    Socket socket = serverSocket.accept();
-                    new Thread(new StreamServer(socket, streamServer2)).start();
                 }
+            }).start();
+            //sending the port address
+            objectOutputStream.writeInt(20000);
+            objectOutputStream.flush();
+            //reading the host(id) and size
+
+            String host=(String)objectInputStream.readObject();
+            int size=(int)objectInputStream.readInt();
+
+            //thread for inserting the new Entry
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        //writing sql query
+                        String query1 = "INSERT INTO Streams(ID,Code,Size,Name) VALUE(\"" + host +
+                                "\"," + 20000 + "," + size + ",\"Video\");";
+
+                        String query2 ="INSERT INTO Streamdata(Host,Frame_no) VALUE(\""+host+
+                                "\",0);";
+                        //executing sql statements
+                        PreparedStatement preStat = connection.prepareStatement(query1);
+                        preStat.executeUpdate();
+                        preStat=connection.prepareStatement(query2);
+                        preStat.executeUpdate();
+                    } catch (SQLException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }).start();
+            WritableImage image;
+            File imageFile;
+            for(int i=0;i<size;i++){
+               streaming.setStatus((Boolean)objectInputStream.readObject());
+               if(streaming.getStatus()) {
+                   //for debugging
+                   System.out.println("Status true, reading object");
+                   imageFile=(File)objectInputStream.readObject();
+                   InputStream in = new FileInputStream(imageFile);
+                   String query = "UPDATE Streamdata SET Image=?,Frame_no=(Frame_no+1) WHERE Host=\"" + host + "\";";
+                   PreparedStatement preStat = connection.prepareStatement(query);
+                   preStat.setBlob(1, in);
+                   preStat.executeUpdate();
+                   try{
+                       Thread.sleep(1);
+                   }catch (InterruptedException e){
+                       e.printStackTrace();
+                   }
+               }else{
+                   String query1 = "DELETE from Streamdata WHERE Host=\"" + host + "\";";
+                   String query2 = "DELETE from Streams WHERE Host=\"" + host + "\";";
+                   PreparedStatement preStat;
+                   preStat= connection.prepareStatement(query1);
+                   preStat.executeUpdate();
+                   preStat = connection.prepareStatement(query2);
+                   preStat.executeUpdate();
+               }
             }
-        }catch(IOException e){
-            e.printStackTrace();
-        }finally {
-            this.streamServer2.exitStream(objectOutputStream);
+
+            streaming.setStatus(true);
+
         }
     }
 

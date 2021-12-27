@@ -6,10 +6,9 @@
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.media.MediaView?>
 
-
 <AnchorPane prefHeight="419.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="client.StreamingGUI">
    <children>
-      <Label layoutX="286.0" layoutY="14.0" text="Label" />
+      <Label fx:id="headLabel" layoutX="286.0" layoutY="14.0" text="Label" />
       <MediaView fx:id="mediaViewItem" fitHeight="320.0" fitWidth="480.0" layoutX="60.0" layoutY="40.0" />
       <HBox layoutX="60.0" layoutY="372.0" prefHeight="28.0" prefWidth="480.0">
          <children>
@@ -17,5 +16,7 @@
             <Button fx:id="pauseAndResumeButton" mnemonicParsing="false" onAction="#pauseAndResumeListener" prefHeight="25.0" prefWidth="262.0" text="Pause" />
          </children>
       </HBox>
+      <Button layoutX="451.0" layoutY="10.0" mnemonicParsing="false" onAction="#endStreamListener" text="End Stream" />
+      <Button layoutX="540.0" layoutY="10.0" mnemonicParsing="false" onAction="#exitListener" text="Exit" />
    </children>
 </AnchorPane>

@@ -23,6 +23,7 @@ public class StreamServer implements Runnable{
     StreamServer(Socket socket,StreamServer2 streamServer2) throws IOException{
         this.socket=socket;
         this.frameNumber=-1;
+        this.socket=socket;
         this.objectInputStream=new ObjectInputStream(socket.getInputStream());
         this.objectOutputStream=new ObjectOutputStream(socket.getOutputStream());
         this.imageFiles=streamServer2.getFrames();
